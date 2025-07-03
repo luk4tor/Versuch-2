@@ -23,6 +23,22 @@ public class Player extends Entity {
     speed = 4;
   }
 
+  public void getPlayerImage() {
+    
+    try {
+
+
+    }catch(IOException e) {
+      e.printStackTrace();
+    }
+    
+  
+
+
+
+
+  }
+
   public void update() {
 
     if(keyH.upPressed == true) {
