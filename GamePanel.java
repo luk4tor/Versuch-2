@@ -29,9 +29,9 @@ public class GamePanel extends JPanel{
     //Größe des Spielbildschirms wird festgelegt
     this.setBackground(Color.black);
     //Hintergrund erstmal schwarz
-    this.sthis.setDoubleBuffered(true);
-    //Er malt im Hintergrund
-    //Anna bis Minute 11:16
+    this.setDoubleBuffered(true);
+    //Er malt im Hintergrund hilft mit rendering performance
+    
   }
 
 }
