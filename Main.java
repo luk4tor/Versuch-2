@@ -14,6 +14,14 @@ public class Main{
     //größe des Fensters kann nicht geändert werden
     window.setTitle("Hasenhunt");
     //Unser Spiel heißt Hasenhunt
+
+    GamePanel gamePanel = new GamePanel();
+    window.add(gamePanel);
+    //fügt Spieloberfläche hinzu
+
+    window.pack();
+    //passt Fenster an Spieloberfläche an
+    
     window.setLocationRelativeTo(null);
     //Keine genaue Plazierung des Fensters sondern in der Mitte des Bildschirms
     window.setVisible(true);
