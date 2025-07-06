@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 //erweitert Graphics um mehr Kontrolle über Geometrie, Koordinatenänderungen, Farben und Texte zu bekommen
 
+import entity.Player;
+
 public class GamePanel extends JPanel implements Runnable{
   //ist wie ein Spielbildschirm
   //SCREEN SETTINGS
@@ -33,7 +35,8 @@ public class GamePanel extends JPanel implements Runnable{
   KeyHandler keyH = new KeyHandler();
   Thread gameThread;
   //hilft dabei wiederholende Sequenzen einzustellen, wie Charakter Animationen
-
+  Player player = new Player(this, keyH);
+  
   //Startposition des Spielers einstellen
   int PlayerX = 100;
   int playerY = 100;
