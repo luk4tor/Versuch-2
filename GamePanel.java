@@ -105,22 +105,7 @@ public class GamePanel extends JPanel implements Runnable{
     }
   }
   public void update{
-    if (keyH.upPressed == true){
-      playerY -= playerSpeed;
-      //Charakter bewegt sich nach oben (weil obere linke Ecke hat Koordinaten 0,0)
-    }
-    else if (keyH.downPressed == true){
-      playerY += playerSpeed;
-      //Charakter bewegt sich nach unten
-    }
-    else if (keyH.leftPressed == true){
-      playerX -= playerSpeed;
-      //Charakter bewegt sich nach unten
-    }
-    else if (keyH.rightPressed == true){
-      playerX += playerSpeed;
-      //Charakter bewegt sich nach unten
-    }
+    player.update();
   }
 
   public void paintComponent(Graphics g){
@@ -130,11 +115,7 @@ public class GamePanel extends JPanel implements Runnable{
     Graphics2D g2 = (Graphics2D)g;
     //g ändert Klasse
 
-    g2.setColor(Color.white);
-    //es wird in weiß gemalt
-
-    g2.fillRect(playerX, playerY, tileSize, tileSize);
-    //erstmal als Spielfigur
+    player.draw(g2);
 
     g2.dispose();
     //die Grafik wird gelöscht, sodass das Programm noch funktioniert, aber Speicherplatz gesparrt wird
