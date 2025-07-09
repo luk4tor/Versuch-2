@@ -1,0 +1,98 @@
+Player.java – Angriffserkennung (Hit Detection)
+1. Attackenbereich deklarieren
+
+java
+public Rectangle attackArea = new Rectangle(0, 0, 36, 36);
+2. Angriffsmethode (attacking()):
+
+java
+public void attacking() {
+    spriteCounter++;
+
+    if (spriteCounter <= 5) {
+        spriteNum = 1;
+    }
+    if (spriteCounter > 5 && spriteCounter <= 25) {
+        spriteNum = 2;
+    }
+    if (spriteCounter > 25) {
+        spriteNum = 1;
+        spriteCounter = 0;
+        attacking = false;
+    }
+
+    // Angriff ausführen, wenn Animation in Phase 2 ist
+    if (spriteCounter == 6) {
+        // Save current position and solidArea
+        int currentWorldX = worldX;
+        int currentWorldY = worldY;
+        int solidAreaWidth = solidArea.width;
+        int solidAreaHeight = solidArea.height;
+
+        // Adjust player position for attack
+        switch (direction) {
+            case "up":
+                worldY -= attackArea.height;
+                break;
+            case "down":
+                worldY += attackArea.height;
+                break;
+            case "left":
+                worldX -= attackArea.width;
+                break;
+            case "right":
+                worldX += attackArea.width;
+                break;
+        }
+
+        // Set solidArea to attackArea
+        solidArea.width = attackArea.width;
+        solidArea.height = attackArea.height;
+
+        // Check monster collision with the attack area
+        int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+        damageMonster(monsterIndex);
+
+        // Restore original position and solidArea
+        worldX = currentWorldX;
+        worldY = currentWorldY;
+        solidArea.width = solidAreaWidth;
+        solidArea.height = solidAreaHeight;
+    }
+}
+3. Monster Schaden zufügen (damageMonster()):
+
+java
+public void damageMonster(int i) {
+    if (i != 999) {
+        if (!gp.monster[i].invincible) {
+            gp.monster[i].life -= 1;
+            gp.monster[i].invincible = true;
+            // Monster besiegen
+            if (gp.monster[i].life <= 0) {
+                gp.monster[i] = null;
+            }
+        }
+    }
+}
+4. Invincible-Logik für Monster (in der Monster-Klasse):
+
+java
+if (invincible) {
+    invincibleCounter++;
+    if (invincibleCounter > 40) {
+        invincible = false;
+        invincibleCounter = 0;
+    }
+}
+5. Transparenz beim Zeichnen (in der Monster-Draw-Methode):
+
+java
+if (invincible) {
+    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+}
+drawMonsterImage();
+g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+
+
