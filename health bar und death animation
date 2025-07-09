@@ -1,0 +1,138 @@
+1. Neue Variablen in der Entity/Monster-Klasse
+
+public boolean alive = true;
+public boolean dying = false;
+public int dyingCounter = 0;
+
+public boolean hpBarOn = false;
+public int hpBarCounter = 0;
+
+
+2. Monster-Todesanimation (Blinken)
+Im Draw-Teil der Entity/Monster-Klasse:
+
+if (dying) {
+    dyingAnimation(g2);
+} else {
+    // normales Zeichnen
+}
+
+
+Die Methode für die Todesanimation:
+
+public void dyingAnimation(Graphics2D g2) {
+    dyingCounter++;
+
+    int interval = 5; // Intervall für das Blinken
+
+    if (dyingCounter <= interval) {
+        changeAlpha(g2, 0f);
+    }
+    if (dyingCounter > interval && dyingCounter <= interval * 2) {
+        changeAlpha(g2, 1f);
+    }
+    if (dyingCounter > interval * 2 && dyingCounter <= interval * 3) {
+        changeAlpha(g2, 0f);
+    }
+    if (dyingCounter > interval * 3 && dyingCounter <= interval * 4) {
+        changeAlpha(g2, 1f);
+    }
+    if (dyingCounter > interval * 4 && dyingCounter <= interval * 5) {
+        changeAlpha(g2, 0f);
+    }
+    if (dyingCounter > interval * 5 && dyingCounter <= interval * 6) {
+        changeAlpha(g2, 1f);
+    }
+    if (dyingCounter > interval * 6 && dyingCounter <= interval * 7) {
+        changeAlpha(g2, 0f);
+    }
+    if (dyingCounter > interval * 7 && dyingCounter <= interval * 8) {
+        changeAlpha(g2, 1f);
+    }
+    if (dyingCounter > interval * 8) {
+        dying = false;
+        alive = false;
+    }
+}
+
+
+Hilfsmethode für Transparenz:
+
+public void changeAlpha(Graphics2D g2, float alpha) {
+    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+}
+
+
+3. Monster „töten“ in der Damage-Methode
+In der Methode, die Schaden zufügt:
+
+public void damageMonster(int i) {
+    if (i != 999) {
+        if (!gp.monster[i].invincible && gp.monster[i].alive) {
+            gp.monster[i].life -= 1;
+            gp.monster[i].invincible = true;
+            gp.monster[i].hpBarOn = true;
+            gp.monster[i].hpBarCounter = 0;
+
+            // Reaktion auf Schaden
+            gp.monster[i].damageReaction();
+
+            // Wenn Leben <= 0, Todesanimation starten
+            if (gp.monster[i].life <= 0) {
+                gp.monster[i].dying = true;
+            }
+        }
+    }
+}
+
+
+4. Monster aus dem Spiel entfernen
+Im GamePanel-Update:
+
+for (int i = 0; i < monster.length; i++) {
+    if (monster[i] != null) {
+        if (monster[i].alive && !monster[i].dying) {
+            monster[i].update();
+        }
+        if (!monster[i].alive) {
+            monster[i] = null;
+        }
+    }
+}
+
+
+5. Health Bar (Lebensbalken) anzeigen
+Im Draw-Teil der Entity/Monster-Klasse:
+
+if (type == 2 && hpBarOn) { // type==2: Monster
+    double oneScale = (double)gp.tileSize / maxLife;
+    double hpBarValue = oneScale * life;
+
+    g2.setColor(new Color(35, 35, 35));
+    g2.fillRect(screenX - 1, screenY - 16, gp.tileSize + 2, 12);
+
+    g2.setColor(new Color(255, 0, 30));
+    g2.fillRect(screenX, screenY - 15, (int)hpBarValue, 10);
+
+    hpBarCounter++;
+    if (hpBarCounter > 600) { // Nach 10 Sekunden ausblenden
+        hpBarOn = false;
+        hpBarCounter = 0;
+    }
+}
+
+
+Health Bar wieder einblenden, wenn Monster getroffen:
+
+// In der damageMonster-Methode:
+gp.monster[i].hpBarOn = true;
+gp.monster[i].hpBarCounter = 0;
+
+
+6. Monster-AI: Reaktion auf Schaden
+In der Entity/Monster-Klasse:
+
+public void damageReaction() {
+    actionLockCounter = 0;
+    direction = gp.player.direction;
+}
