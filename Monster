@@ -1,0 +1,143 @@
+1. Monster-Klasse anlegen (MON_GreenSlime.java)
+
+package monster;
+
+import entity.Entity;
+import main.GamePanel
+
+public class MON_GreenSlime extends Entity {
+    public MON_GreenSlime(GamePanel gp) {
+        super(gp);
+        name = "Green Slime";
+        speed = 1;
+        maxLife = 4;
+        life = maxLife;
+
+        solidArea.x = 3;
+        solidArea.y = 18;
+        solidArea.width = 42; // 48 - 6
+        solidArea.height = 30;
+
+        getImage();
+    }
+
+    public void getImage() {
+        down1 = setup("monster/greenslime_down_1", gp.tileSize, gp.tileSize);
+        down2 = setup("monster/greenslime_down_2", gp.tileSize, gp.tileSize);
+        left1 = down1;
+        left2 = down2;
+        right1 = down1;
+        right2 = down2;
+        up1 = down1;
+        up2 = down2;
+    }
+
+    public void setAction() {
+        // Einfache KI, zufällige Richtung (wie beim OldMan kopieren)
+        actionLockCounter++;
+        if (actionLockCounter == 120) {
+            int i = new Random().nextInt(4);
+            switch (i) {
+                case 0: direction = "up"; break;
+                case 1: direction = "down"; break;
+                case 2: direction = "left"; break;
+                case 3: direction = "right"; break;
+            }
+            actionLockCounter = 0;
+        }
+    }
+}
+
+
+2. Monster-Array im GamePanel
+
+public Entity[] monster = new Entity[20]; // Maximale Anzahl gleichzeitig sichtbarer Monster
+
+
+3. Monster auf der Karte platzieren (AssetSetter.java)
+
+public void setMonster() {
+    gp.monster[0] = new MON_GreenSlime(gp);
+    gp.monster[0].worldX = gp.tileSize * 23;
+    gp.monster[0].worldY = gp.tileSize * 7;
+
+    gp.monster[1] = new MON_GreenSlime(gp);
+    gp.monster[1].worldX = gp.tileSize * 23;
+    gp.monster[1].worldY = gp.tileSize * 40;
+}
+
+
+4. Monster im Update und Zeichnen berücksichtigen
+Update:
+
+for (int i = 0; i < monster.length; i++) {
+    if (monster[i] != null) {
+        monster[i].update();
+    }
+}
+
+
+Draw:
+
+// In der Entity-Draw-Liste monster[] ergänzen
+
+
+5. Kollisionsabfrage und Schaden
+Im Player:
+
+int monsterIndex = gp.cChecker.checkEntity(this, gp.monster);
+contactMonster(monsterIndex);
+
+public void contactMonster(int i) {
+    if (i != 999) {
+        life -= 1; // Schaden, später mit Stats erweitern
+        invincible = true;
+    }
+}
+
+
+6. Invincibility-Mechanik
+In Entity:
+
+public boolean invincible = false;
+public int invincibleCounter = 0;
+
+
+
+Im Player-Update:
+
+if (invincible) {
+    invincibleCounter++;
+    if (invincibleCounter > 60) { // 1 Sekunde bei 60 FPS
+        invincible = false;
+        invincibleCounter = 0;
+    }
+}
+
+
+7. Visualisierung der Unverwundbarkeit
+Im Draw-Method:
+
+if (invincible) {
+    g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
+}
+// Spieler zeichnen
+g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
+
+8. Typen für Entity unterscheiden
+
+public int type; // 0 = Player, 1 = NPC, 2 = Monster
+
+// In MON_GreenSlime-Konstruktor:
+type = 2;
+
+
+9. Kollisionsabfrage so anpassen, dass sich Entities nicht selbst als Ziel erkennen
+In CollisionChecker:
+
+if (target[i] != null && target[i] != entity) {
+    // Kollisionslogik
+}
+
+
