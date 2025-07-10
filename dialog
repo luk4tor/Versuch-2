@@ -1,0 +1,118 @@
+1. Neue GameState-Konstante
+In deiner GamePanel-Klasse:
+
+java
+public final int dialogueState = 3;
+
+2. Dialogfenster in der UI-Klasse zeichnen
+In deiner UI-Klasse:
+
+java
+public String currentDialogue = "";
+
+public void draw(Graphics2D g2) {
+    // ... andere UI-Elemente
+
+    if (gp.gameState == gp.dialogueState) {
+        drawDialogueScreen(g2);
+    }
+}
+
+public void drawDialogueScreen(Graphics2D g2) {
+    // Fenster-Parameter berechnen
+    int x = gp.tileSize * 2;
+    int y = gp.tileSize / 2;
+    int width = gp.screenWidth - (gp.tileSize * 4);
+    int height = gp.tileSize * 4;
+
+    drawSubWindow(g2, x, y, width, height);
+
+    // Text mit Zeilenumbruch anzeigen
+    g2.setFont(g2.getFont().deriveFont(Font.PLAIN, 28F));
+    x += gp.tileSize;
+    y += gp.tileSize;
+
+    for (String line : currentDialogue.split("\n")) {
+        g2.drawString(line, x, y);
+        y += 40; // Abstand zwischen den Zeilen
+    }
+}
+
+public void drawSubWindow(Graphics2D g2, int x, int y, int width, int height) {
+    Color c = new Color(0, 0, 0, 210); // Schwarz mit Transparenz
+    g2.setColor(c);
+    g2.fillRoundRect(x, y, width, height, 35, 35);
+
+    c = new Color(255, 255, 255); // Weißer Rahmen
+    g2.setColor(c);
+    g2.setStroke(new BasicStroke(5));
+    g2.drawRoundRect(x + 5, y + 5, width - 10, height - 10, 25, 25);
+}
+
+3. Dialoge im Entity/NPC
+In der Entity-Klasse:
+
+java
+public String[] dialogues = new String[20];
+public int dialogueIndex = 0;
+
+public void speak() {
+    if (dialogues[dialogueIndex] == null) {
+        dialogueIndex = 0;
+    }
+    gp.ui.currentDialogue = dialogues[dialogueIndex];
+    dialogueIndex++;
+
+    // NPC dreht sich zum Spieler
+    switch (gp.player.direction) {
+        case "up": direction = "down"; break;
+        case "down": direction = "up"; break;
+        case "left": direction = "right"; break;
+        case "right": direction = "left"; break;
+    }
+}
+In deinem NPC (z.B. OldMan):
+
+java
+public void setDialogue() {
+    dialogues[0] = "Hello lad!";
+    dialogues[1] = "So you've come to this island to find the treasure?";
+    dialogues[2] = "I used to be a great wizard, but now I'm old.";
+    // usw.
+}
+Im NPC-Konstruktor:
+
+java
+setDialogue();
+4. NPC-Interaktion im Player
+In der Player-Klasse, wenn du einen NPC ansprichst:
+
+java
+if (npcIndex != 999 && gp.keyH.enterPressed) {
+    gp.gameState = gp.dialogueState;
+    gp.npc[npcIndex].speak();
+    gp.keyH.enterPressed = false;
+}
+5. KeyHandler anpassen
+In der KeyHandler-Klasse:
+
+java
+public boolean enterPressed;
+
+// Im keyPressed-Event:
+if (code == KeyEvent.VK_ENTER) {
+    enterPressed = true;
+}
+6. Dialog schließen
+In der KeyHandler-Klasse, im Update:
+
+java
+if (gp.gameState == gp.dialogueState && enterPressed) {
+    gp.gameState = gp.playState;
+    enterPressed = false;
+}
+7. Zeilenumbruch in Dialogen
+Um Zeilenumbruch zu nutzen, schreibe in den Dialog-Texten z.B.:
+
+java
+dialogues[1] = "So you've come to this island\nto find the treasure?";
